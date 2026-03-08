@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5 Minute Journal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Lora', Georgia, 'Times New Roman', serif;
+            background: #FAF8F5;
+            color: #2C2C2C;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #app {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 3rem 2rem 4rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: #A09890;
+        }
+
+        /* Date navigation */
+        .date-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .date-nav button {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            color: #A09890;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            font-family: inherit;
+            transition: color 0.2s;
+        }
+
+        .date-nav button:hover:not(:disabled) {
+            color: #2C2C2C;
+        }
+
+        .date-nav button:disabled {
+            opacity: 0;
+            cursor: default;
+        }
+
+        .date-display {
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            color: #4A4440;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .date-display:hover {
+            color: #2C2C2C;
+        }
+
+        .date-picker {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            cursor: pointer;
+        }
+
+        /* Quote */
+        .quote {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 0 1rem;
+        }
+
+        .quote p {
+            font-style: italic;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: #3D3632;
+            margin-bottom: 0.5rem;
+        }
+
+        .quote cite {
+            font-size: 0.8rem;
+            font-style: normal;
+            color: #7A7268;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-icon {
+            font-size: 1.15rem;
+        }
+
+        .icon-sun { color: #C49A3C; }
+        .icon-moon { color: #6E7F92; }
+
+        .section-header h2 {
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #7A7268;
+        }
+
+        /* Prompts */
+        .prompt {
+            margin-bottom: 2rem;
+        }
+
+        .prompt-label {
+            font-style: italic;
+            font-size: 1.05rem;
+            color: #3D3632;
+            text-align: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .prompt-line {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .prompt-line .num {
+            font-size: 0.9rem;
+            color: #8A8078;
+            flex-shrink: 0;
+            width: 1rem;
+            text-align: right;
+        }
+
+        .prompt-line input,
+        .prompt-single input {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #C8C0B8;
+            background: transparent;
+            font-family: 'Lora', Georgia, serif;
+            font-size: 1rem;
+            color: #2C2C2C;
+            padding: 0.3rem 0;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .prompt-line input:focus,
+        .prompt-single input:focus {
+            border-bottom-color: #8A8078;
+        }
+
+        .prompt-line input[readonly],
+        .prompt-single input[readonly] {
+            color: #4A4440;
+            cursor: default;
+        }
+
+        .prompt-single {
+            margin-bottom: 0.75rem;
+        }
+
+        /* Divider */
+        .divider {
+            border: none;
+            border-top: 1px solid #E8E3DD;
+            margin: 3rem 0;
+        }
+
+        /* Past entry styling */
+        .past-entry {
+            background: #F5F0E8;
+        }
+
+        /* Dark mode */
+        body.dark {
+            background: #1A1918;
+            color: #D4CFC8;
+        }
+
+        body.dark header h1 { color: #6B635B; }
+        body.dark .date-nav button { color: #6B635B; }
+        body.dark .date-nav button:hover:not(:disabled) { color: #D4CFC8; }
+        body.dark .date-display { color: #8A8279; }
+        body.dark .date-display:hover { color: #D4CFC8; }
+        body.dark .quote p { color: #B8AFA8; }
+        body.dark .quote cite { color: #7A7268; }
+        body.dark .section-header h2 { color: #7A7268; }
+        body.dark .icon-sun { color: #C49A3C; }
+        body.dark .icon-moon { color: #7B8DA0; }
+        body.dark .prompt-label { color: #B8AFA8; }
+        body.dark .prompt-line .num { color: #6B635B; }
+        body.dark .prompt-line input,
+        body.dark .prompt-single input {
+            color: #D4CFC8;
+            border-bottom-color: #3A3632;
+        }
+        body.dark .prompt-line input:focus,
+        body.dark .prompt-single input:focus {
+            border-bottom-color: #6B635B;
+        }
+        body.dark .prompt-line input[readonly],
+        body.dark .prompt-single input[readonly] {
+            color: #9A918A;
+        }
+        body.dark .divider { border-top-color: #2A2725; }
+        body.dark.past-entry { background: #151312; }
+        body.dark .theme-toggle { color: #6B635B; }
+        body.dark .theme-toggle:hover { color: #D4CFC8; }
+
+        /* Theme toggle */
+        .theme-toggle {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            color: #A09890;
+            cursor: pointer;
+            padding: 0.5rem;
+            font-family: inherit;
+            transition: color 0.2s;
+            line-height: 1;
+            z-index: 10;
+        }
+
+        .theme-toggle:hover { color: #2C2C2C; }
+
+        /* Help toggle */
+        .help-toggle {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 0.8rem;
+            color: #A09890;
+            cursor: pointer;
+            padding: 0.5rem;
+            font-family: inherit;
+            transition: color 0.2s;
+            line-height: 1;
+            z-index: 10;
+            letter-spacing: 0.05em;
+        }
+
+        .help-toggle:hover { color: #2C2C2C; }
+        body.dark .help-toggle { color: #6B635B; }
+        body.dark .help-toggle:hover { color: #D4CFC8; }
+
+        /* Guide overlay */
+        .guide-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .guide-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .guide {
+            background: #FAF8F5;
+            max-width: 540px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2.5rem 2rem;
+            position: relative;
+        }
+
+        body.dark .guide {
+            background: #1A1918;
+        }
+
+        .guide-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.25rem;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #A09890;
+            cursor: pointer;
+            font-family: inherit;
+            line-height: 1;
+        }
+
+        .guide-close:hover { color: #2C2C2C; }
+        body.dark .guide-close:hover { color: #D4CFC8; }
+
+        .guide h2 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.02em;
+        }
+
+        .guide .guide-subtitle {
+            text-align: center;
+            font-style: italic;
+            font-size: 0.85rem;
+            color: #8A8279;
+            margin-bottom: 2rem;
+        }
+
+        .guide-section {
+            margin-bottom: 2rem;
+        }
+
+        .guide-section h3 {
+            font-size: 0.7rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #A09890;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .guide-step {
+            margin-bottom: 1.25rem;
+        }
+
+        .guide-step .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.4rem;
+            height: 1.4rem;
+            border-radius: 50%;
+            background: #2C2C2C;
+            color: #FAF8F5;
+            font-size: 0.65rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        body.dark .guide-step .step-num {
+            background: #D4CFC8;
+            color: #1A1918;
+        }
+
+        .guide-step p {
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: #5A534B;
+            margin-top: 0.35rem;
+        }
+
+        body.dark .guide-step p { color: #8A8279; }
+
+        .guide-step .step-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #2C2C2C;
+        }
+
+        body.dark .guide-step .step-title { color: #D4CFC8; }
+
+        .guide-example {
+            font-style: italic;
+            color: #A09890;
+            font-size: 0.8rem;
+            margin-top: 0.35rem;
+            padding-left: 1.9rem;
+        }
+
+        .guide-divider {
+            border: none;
+            border-top: 1px solid #E8E3DD;
+            margin: 1.5rem 0;
+        }
+
+        body.dark .guide-divider { border-top-color: #2A2725; }
+
+        .guide-start {
+            display: block;
+            margin: 2rem auto 0;
+            background: none;
+            border: 1px solid #D4CFC8;
+            color: #6B635B;
+            font-family: 'Lora', Georgia, serif;
+            font-size: 0.8rem;
+            padding: 0.6rem 2rem;
+            cursor: pointer;
+            letter-spacing: 0.1em;
+            transition: all 0.2s;
+        }
+
+        .guide-start:hover {
+            border-color: #2C2C2C;
+            color: #2C2C2C;
+        }
+
+        body.dark .guide-start {
+            border-color: #3A3632;
+            color: #8A8279;
+        }
+
+        body.dark .guide-start:hover {
+            border-color: #D4CFC8;
+            color: #D4CFC8;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            #app { padding: 2rem 1.25rem 3rem; }
+            .guide { padding: 2rem 1.5rem; }
+        }
+
+        /* Smooth transition */
+        body, body * {
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>5 Minute Journal</h1>
+        </header>
+
+        <nav class="date-nav">
+            <button id="prev-day" aria-label="Previous day">&larr;</button>
+            <span class="date-display" id="date-display">
+                <input type="date" class="date-picker" id="date-picker">
+            </span>
+            <button id="next-day" aria-label="Next day">&rarr;</button>
+        </nav>
+
+        <div class="quote" id="quote">
+            <p id="quote-text"></p>
+            <cite id="quote-author"></cite>
+        </div>
+
+        <section class="section" id="morning">
+            <div class="section-header">
+                <span class="section-icon icon-sun">&#9788;</span>
+                <h2>Morning</h2>
+            </div>
+
+            <div class="prompt">
+                <div class="prompt-label">I am grateful for...</div>
+                <div class="prompt-line"><span class="num">1.</span><input type="text" data-field="grateful" data-index="0"></div>
+                <div class="prompt-line"><span class="num">2.</span><input type="text" data-field="grateful" data-index="1"></div>
+                <div class="prompt-line"><span class="num">3.</span><input type="text" data-field="grateful" data-index="2"></div>
+            </div>
+
+            <div class="prompt">
+                <div class="prompt-label">What would make today great?</div>
+                <div class="prompt-line"><span class="num">1.</span><input type="text" data-field="great" data-index="0"></div>
+                <div class="prompt-line"><span class="num">2.</span><input type="text" data-field="great" data-index="1"></div>
+                <div class="prompt-line"><span class="num">3.</span><input type="text" data-field="great" data-index="2"></div>
+            </div>
+
+            <div class="prompt">
+                <div class="prompt-label">Daily affirmations. I am...</div>
+                <div class="prompt-single"><input type="text" data-field="affirmation" data-index="0"></div>
+                <div class="prompt-single"><input type="text" data-field="affirmation" data-index="1"></div>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <section class="section" id="evening">
+            <div class="section-header">
+                <span class="section-icon icon-moon">&#9789;</span>
+                <h2>Evening</h2>
+            </div>
+
+            <div class="prompt">
+                <div class="prompt-label">3 Amazing things that happened today...</div>
+                <div class="prompt-line"><span class="num">1.</span><input type="text" data-field="amazing" data-index="0"></div>
+                <div class="prompt-line"><span class="num">2.</span><input type="text" data-field="amazing" data-index="1"></div>
+                <div class="prompt-line"><span class="num">3.</span><input type="text" data-field="amazing" data-index="2"></div>
+            </div>
+
+            <div class="prompt">
+                <div class="prompt-label">How could I have made today even better?</div>
+                <div class="prompt-single"><input type="text" data-field="better" data-index="0"></div>
+                <div class="prompt-single"><input type="text" data-field="better" data-index="1"></div>
+            </div>
+        </section>
+    </div>
+
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">&#9789;</button>
+    <button class="help-toggle" id="help-toggle" aria-label="How to use">?</button>
+
+    <!-- Guide overlay -->
+    <div class="guide-overlay" id="guide-overlay">
+        <div class="guide">
+            <button class="guide-close" id="guide-close">&times;</button>
+
+            <h2>The Five Minute Journal</h2>
+            <p class="guide-subtitle">The simplest, most effective thing you can do every day to be happier.</p>
+
+            <hr class="guide-divider">
+
+            <div class="guide-section">
+                <h3><span class="icon-sun">&#9788;</span> The Morning Routine</h3>
+
+                <div class="guide-step">
+                    <span class="step-num">1</span>
+                    <span class="step-title">I am grateful for...</span>
+                    <p>As soon as you wake up, write 3 things you are grateful for. Get specific. Take time to connect with the feeling behind your gratitude before moving on.</p>
+                    <div class="guide-example">
+                        e.g. "The warm bed that I sleep in" &middot; "My body working in perfect harmony" &middot; "The true and genuine friends in my life"
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <span class="step-num">2</span>
+                    <span class="step-title">What would make today great?</span>
+                    <p>Write down 3 actions you will take today. Ask yourself how you want to feel at the end of the day and write down actions that would give you that feeling.</p>
+                    <div class="guide-example">
+                        e.g. "Take extra time for myself before leaving work" &middot; "Give a thank you note to mom" &middot; "Sleep before 10 pm"
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <span class="step-num">3</span>
+                    <span class="step-title">Daily affirmations. I am...</span>
+                    <p>Write a simple statement in the present tense that focuses on what you want to create in your life. The litmus test is how you feel after you write it. If it doesn't resonate, step back and reassess.</p>
+                    <div class="guide-example">
+                        e.g. "I am confident and comfortable in my own skin and I live with passion and purpose."
+                    </div>
+                </div>
+            </div>
+
+            <hr class="guide-divider">
+
+            <div class="guide-section">
+                <h3><span class="icon-moon">&#9789;</span> The Night Routine</h3>
+
+                <div class="guide-step">
+                    <span class="step-num">4</span>
+                    <span class="step-title">3 Amazing things that happened today...</span>
+                    <p>Before going to sleep, write 3 amazing things that happened during your day. Get specific and remember to connect with the feeling.</p>
+                    <div class="guide-example">
+                        e.g. "I remembered to floss" &middot; "A friend recommended a wonderful book" &middot; "I saw a cute stranger at the cafe"
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <span class="step-num">5</span>
+                    <span class="step-title">How could I have made today even better?</span>
+                    <p>Review your day, but there is no need to be harsh. Be honest yet kind to yourself. This is your personal reminder that you have the power to change your perception of the past and influence the future.</p>
+                    <div class="guide-example">
+                        e.g. "I wake up when the alarm goes off" &middot; "I go to the gym in the morning"
+                    </div>
+                </div>
+            </div>
+
+            <button class="guide-start" id="guide-start">Begin journaling</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Quotes ---
+        const QUOTES = [
+            { text: "The unexamined life is not worth living.", author: "Socrates" },
+            { text: "We suffer more often in imagination than in reality.", author: "Seneca" },
+            { text: "The soul becomes dyed with the colour of its thoughts.", author: "Marcus Aurelius" },
+            { text: "No man is free who is not master of himself.", author: "Epictetus" },
+            { text: "Knowing yourself is the beginning of all wisdom.", author: "Aristotle" },
+            { text: "The only true wisdom is in knowing you know nothing.", author: "Socrates" },
+            { text: "It is not that we have a short time to live, but that we waste a great deal of it.", author: "Seneca" },
+            { text: "Happiness depends upon ourselves.", author: "Aristotle" },
+            { text: "Man is the measure of all things.", author: "Protagoras" },
+            { text: "The mind is everything. What you think you become.", author: "Buddha" },
+            { text: "He who has a why to live can bear almost any how.", author: "Nietzsche" },
+            { text: "The way to do is to be.", author: "Lao Tzu" },
+            { text: "Everything flows.", author: "Heraclitus" },
+            { text: "Waste no more time arguing about what a good man should be. Be one.", author: "Marcus Aurelius" },
+            { text: "It is the mark of an educated mind to be able to entertain a thought without accepting it.", author: "Aristotle" },
+            { text: "The impediment to action advances action. What stands in the way becomes the way.", author: "Marcus Aurelius" },
+            { text: "Man is condemned to be free.", author: "Jean-Paul Sartre" },
+            { text: "One cannot step twice in the same river.", author: "Heraclitus" },
+            { text: "The happiness of your life depends upon the quality of your thoughts.", author: "Marcus Aurelius" },
+            { text: "To be is to be perceived.", author: "George Berkeley" },
+            { text: "Liberty consists in doing what one desires.", author: "John Stuart Mill" },
+            { text: "The life of money-making is one undertaken under compulsion, and wealth is evidently not the good we are seeking.", author: "Aristotle" },
+            { text: "Begin at once to live, and count each separate day as a separate life.", author: "Seneca" },
+            { text: "In the depth of winter, I finally learned that within me there lay an invincible summer.", author: "Albert Camus" },
+            { text: "The secret of happiness, you see, is not found in seeking more, but in developing the capacity to enjoy less.", author: "Socrates" },
+            { text: "A man who dares to waste one hour of time has not discovered the value of life.", author: "Charles Darwin" },
+            { text: "If you are distressed by anything external, the pain is not due to the thing itself, but to your estimate of it.", author: "Marcus Aurelius" },
+            { text: "The soul that sees beauty may sometimes walk alone.", author: "Goethe" },
+            { text: "To live is the rarest thing in the world. Most people exist, that is all.", author: "Oscar Wilde" },
+            { text: "He who fears death will never do anything worthy of a living man.", author: "Seneca" },
+            { text: "The only thing I know is that I know nothing.", author: "Socrates" },
+            { text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.", author: "Aristotle" },
+            { text: "The mind that is anxious about future events is miserable.", author: "Seneca" },
+            { text: "Thou shouldst eat to live; not live to eat.", author: "Socrates" },
+            { text: "A journey of a thousand miles begins with a single step.", author: "Lao Tzu" },
+            { text: "The world is full of magical things patiently waiting for our wits to grow sharper.", author: "Bertrand Russell" },
+            { text: "What we achieve inwardly will change outer reality.", author: "Plutarch" },
+            { text: "The greatest wealth is to live content with little.", author: "Plato" },
+            { text: "Be tolerant with others and strict with yourself.", author: "Marcus Aurelius" },
+            { text: "Nothing exists except atoms and empty space; everything else is opinion.", author: "Democritus" },
+            { text: "The measure of a man is what he does with power.", author: "Plato" },
+            { text: "He is a wise man who does not grieve for the things which he has not, but rejoices for those which he has.", author: "Epictetus" },
+            { text: "One must imagine Sisyphus happy.", author: "Albert Camus" },
+            { text: "The soul is healed by being with children.", author: "Dostoevsky" },
+            { text: "To find yourself, think for yourself.", author: "Socrates" },
+            { text: "All things are ready, if our minds be so.", author: "Shakespeare" },
+            { text: "That which does not kill us makes us stronger.", author: "Nietzsche" },
+            { text: "I think therefore I am.", author: "Descartes" },
+            { text: "The wound is the place where the light enters you.", author: "Rumi" },
+            { text: "Do not spoil what you have by desiring what you have not.", author: "Epicurus" },
+        ];
+
+        // --- Date utilities ---
+        function getToday() {
+            const d = new Date();
+            return formatDate(d);
+        }
+
+        function formatDate(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function parseDate(str) {
+            const [y, m, d] = str.split('-').map(Number);
+            return new Date(y, m - 1, d);
+        }
+
+        function displayDate(str) {
+            const d = parseDate(str);
+            return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function getDayOfYear(str) {
+            const d = parseDate(str);
+            const start = new Date(d.getFullYear(), 0, 0);
+            return Math.floor((d - start) / 86400000);
+        }
+
+        function addDays(str, n) {
+            const d = parseDate(str);
+            d.setDate(d.getDate() + n);
+            return formatDate(d);
+        }
+
+        // --- State ---
+        let currentDate = getToday();
+
+        // --- Storage ---
+        function emptyEntry() {
+            return {
+                morning: { grateful: ['', '', ''], great: ['', '', ''], affirmation: ['', ''] },
+                evening: { amazing: ['', '', ''], better: ['', ''] }
+            };
+        }
+
+        function loadEntry(date) {
+            const raw = localStorage.getItem(`journal:${date}`);
+            if (!raw) return emptyEntry();
+            const entry = JSON.parse(raw);
+            // Migrate old format
+            if (entry.evening && entry.evening.highlights) {
+                entry.evening.amazing = entry.evening.highlights;
+                delete entry.evening.highlights;
+            }
+            if (entry.evening && typeof entry.evening.learned === 'string') {
+                entry.evening.better = [entry.evening.learned, ''];
+                delete entry.evening.learned;
+            }
+            if (entry.morning && typeof entry.morning.affirmation === 'string') {
+                entry.morning.affirmation = [entry.morning.affirmation, ''];
+            }
+            if (entry.evening && typeof entry.evening.better === 'string') {
+                entry.evening.better = [entry.evening.better, ''];
+            }
+            return entry;
+        }
+
+        function saveEntry() {
+            const entry = readFieldsToEntry();
+            localStorage.setItem(`journal:${currentDate}`, JSON.stringify(entry));
+        }
+
+        function readFieldsToEntry() {
+            const entry = emptyEntry();
+            document.querySelectorAll('input[data-field]').forEach(input => {
+                const field = input.dataset.field;
+                const index = input.dataset.index;
+                const section = ['grateful', 'great', 'affirmation'].includes(field) ? 'morning' : 'evening';
+                if (index !== undefined) {
+                    entry[section][field][parseInt(index)] = input.value;
+                } else {
+                    entry[section][field] = input.value;
+                }
+            });
+            return entry;
+        }
+
+        // --- Debounced save ---
+        let saveTimer;
+        function debouncedSave() {
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(saveEntry, 300);
+        }
+
+        // --- Rendering ---
+        function renderPage(date) {
+            currentDate = date;
+            const today = getToday();
+            const isToday = date === today;
+            const isFuture = date > today;
+
+            if (isFuture) {
+                currentDate = today;
+                renderPage(today);
+                return;
+            }
+
+            // Date display
+            document.getElementById('date-display').childNodes[0]?.remove();
+            document.getElementById('date-display').insertAdjacentText('afterbegin', displayDate(date));
+
+            // Date picker
+            const picker = document.getElementById('date-picker');
+            picker.value = date;
+            picker.max = today;
+
+            // Nav buttons
+            document.getElementById('next-day').disabled = isToday;
+            const entryDates = getEntryDates();
+            const firstEntry = entryDates[0] || today;
+            document.getElementById('prev-day').disabled = date <= firstEntry;
+
+            // Constrain date picker to entry range
+            picker.min = firstEntry;
+
+            // Quote
+            const dayOfYear = getDayOfYear(date);
+            const quote = QUOTES[(dayOfYear - 1) % QUOTES.length];
+            document.getElementById('quote-text').textContent = `\u201C${quote.text}\u201D`;
+            document.getElementById('quote-author').textContent = `\u2014 ${quote.author}`;
+
+            // Entry data
+            const entry = loadEntry(date);
+
+            // Populate fields
+            document.querySelectorAll('input[data-field]').forEach(input => {
+                const field = input.dataset.field;
+                const index = input.dataset.index;
+                const section = ['grateful', 'great', 'affirmation'].includes(field) ? 'morning' : 'evening';
+                if (index !== undefined) {
+                    input.value = (entry[section][field] && entry[section][field][parseInt(index)]) || '';
+                } else {
+                    input.value = entry[section][field] || '';
+                }
+                input.readOnly = !isToday;
+            });
+
+            // Past entry styling
+            document.body.classList.toggle('past-entry', !isToday);
+        }
+
+        // --- Helpers ---
+        function getEntryDates() {
+            return Object.keys(localStorage)
+                .filter(k => k.startsWith('journal:') && k !== 'journal:theme' && k !== 'journal:guided')
+                .map(k => k.replace('journal:', ''))
+                .sort();
+        }
+
+        // --- Event listeners ---
+        document.getElementById('prev-day').addEventListener('click', () => {
+            const prev = addDays(currentDate, -1);
+            const dates = getEntryDates();
+            const firstEntry = dates[0] || getToday();
+            if (prev >= firstEntry) renderPage(prev);
+        });
+
+        document.getElementById('next-day').addEventListener('click', () => {
+            const next = addDays(currentDate, 1);
+            if (next <= getToday()) renderPage(next);
+        });
+
+        document.getElementById('date-picker').addEventListener('change', (e) => {
+            const val = e.target.value;
+            const dates = getEntryDates();
+            const firstEntry = dates[0] || getToday();
+            if (val && val >= firstEntry && val <= getToday()) {
+                renderPage(val);
+            }
+        });
+
+        // Auto-save on input
+        document.querySelectorAll('input[data-field]').forEach(input => {
+            input.addEventListener('input', debouncedSave);
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            if (e.key === 'ArrowLeft') document.getElementById('prev-day').click();
+            if (e.key === 'ArrowRight') document.getElementById('next-day').click();
+            if (e.key === 'Escape') closeGuide();
+        });
+
+        // Midnight rollover check
+        setInterval(() => {
+            const today = getToday();
+            if (currentDate !== today && document.getElementById('next-day').disabled) {
+                renderPage(today);
+            }
+        }, 60000);
+
+        // --- Theme ---
+        function initTheme() {
+            const saved = localStorage.getItem('journal:theme');
+            if (saved === 'dark') {
+                document.body.classList.add('dark');
+                document.getElementById('theme-toggle').innerHTML = '&#9788;';
+            }
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const isDark = document.body.classList.toggle('dark');
+            localStorage.setItem('journal:theme', isDark ? 'dark' : 'light');
+            document.getElementById('theme-toggle').innerHTML = isDark ? '&#9788;' : '&#9789;';
+        });
+
+        // --- Guide ---
+        const overlay = document.getElementById('guide-overlay');
+
+        function openGuide() {
+            overlay.classList.add('visible');
+        }
+
+        function closeGuide() {
+            overlay.classList.remove('visible');
+            localStorage.setItem('journal:guided', '1');
+        }
+
+        document.getElementById('guide-close').addEventListener('click', closeGuide);
+        document.getElementById('guide-start').addEventListener('click', closeGuide);
+        document.getElementById('help-toggle').addEventListener('click', openGuide);
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeGuide();
+        });
+
+        // --- Boot ---
+        initTheme();
+        renderPage(getToday());
+
+        // Show guide on first visit
+        if (!localStorage.getItem('journal:guided')) {
+            openGuide();
+        }
+    </script>
+</body>
+</html>
