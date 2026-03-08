@@ -42,6 +42,46 @@
             color: #A09890;
         }
 
+        /* Fixed buttons */
+        .fixed-btn {
+            position: fixed;
+            background: none;
+            border: none;
+            color: #A09890;
+            cursor: pointer;
+            padding: 0.5rem;
+            font-family: inherit;
+            transition: color 0.2s;
+            line-height: 1;
+            z-index: 10;
+        }
+
+        .fixed-btn:hover { color: #2C2C2C; }
+        body.dark .fixed-btn { color: #6B635B; }
+        body.dark .fixed-btn:hover { color: #D4CFC8; }
+
+        .theme-toggle {
+            bottom: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .help-toggle {
+            bottom: 1.5rem;
+            left: 1.5rem;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        .lang-toggle {
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
         /* Date navigation */
         .date-nav {
             display: flex;
@@ -247,48 +287,6 @@
         }
         body.dark .divider { border-top-color: #2A2725; }
         body.dark.past-entry { background: #151312; }
-        body.dark .theme-toggle { color: #6B635B; }
-        body.dark .theme-toggle:hover { color: #D4CFC8; }
-
-        /* Fixed buttons */
-        .fixed-btn {
-            position: fixed;
-            background: none;
-            border: none;
-            color: #A09890;
-            cursor: pointer;
-            padding: 0.5rem;
-            font-family: inherit;
-            transition: color 0.2s;
-            line-height: 1;
-            z-index: 10;
-        }
-
-        .fixed-btn:hover { color: #2C2C2C; }
-        body.dark .fixed-btn { color: #6B635B; }
-        body.dark .fixed-btn:hover { color: #D4CFC8; }
-
-        .theme-toggle {
-            bottom: 1.5rem;
-            right: 1.5rem;
-            font-size: 1.1rem;
-        }
-
-        .help-toggle {
-            bottom: 1.5rem;
-            left: 1.5rem;
-            font-size: 0.8rem;
-            letter-spacing: 0.05em;
-        }
-
-        .lang-toggle {
-            bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.7rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
 
         /* Guide overlay */
         .guide-overlay {
