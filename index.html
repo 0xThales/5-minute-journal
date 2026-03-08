@@ -977,10 +977,12 @@
 
         function openGuide() {
             overlay.classList.add('visible');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeGuide() {
             overlay.classList.remove('visible');
+            document.body.style.overflow = '';
             localStorage.setItem('journal:guided', '1');
         }
 
