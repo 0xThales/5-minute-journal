@@ -1,0 +1,480 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Lora', Georgia, 'Times New Roman', serif;
+    background: #FAF8F5;
+    color: #2C2C2C;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+#app {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 3rem 2rem 4rem;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+header h1 {
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #A09890;
+}
+
+/* Fixed buttons */
+.fixed-btn {
+    position: fixed;
+    background: none;
+    border: none;
+    color: #A09890;
+    cursor: pointer;
+    padding: 0.5rem;
+    font-family: inherit;
+    transition: color 0.2s;
+    line-height: 1;
+    z-index: 10;
+}
+
+.fixed-btn:hover { color: #2C2C2C; }
+body.dark .fixed-btn { color: #6B635B; }
+body.dark .fixed-btn:hover { color: #D4CFC8; }
+
+.theme-toggle {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    font-size: 1.1rem;
+}
+
+.help-toggle {
+    bottom: 1.5rem;
+    left: 1.5rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+}
+
+.lang-toggle {
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.settings-toggle {
+    top: 1.5rem;
+    right: 1.5rem;
+    font-size: 1rem;
+}
+
+/* Date navigation */
+.date-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+}
+
+.date-nav button {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: #A09890;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    font-family: inherit;
+    transition: color 0.2s;
+}
+
+.date-nav button:hover:not(:disabled) {
+    color: #2C2C2C;
+}
+
+.date-nav button:disabled {
+    opacity: 0;
+    cursor: default;
+}
+
+.date-display {
+    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    color: #4A4440;
+    cursor: pointer;
+    position: relative;
+}
+
+.date-display:hover {
+    color: #2C2C2C;
+}
+
+.date-picker {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+}
+
+/* Quote */
+.quote {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 0 1rem;
+}
+
+.quote p {
+    font-style: italic;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #3D3632;
+    margin-bottom: 0.5rem;
+}
+
+.quote cite {
+    font-size: 0.8rem;
+    font-style: normal;
+    color: #7A7268;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+/* Sections */
+.section {
+    margin-bottom: 3rem;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.section-icon {
+    font-size: 1.15rem;
+}
+
+.icon-sun { color: #C49A3C; }
+.icon-moon { color: #6E7F92; }
+
+.section-header h2 {
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #7A7268;
+}
+
+/* Prompts */
+.prompt {
+    margin-bottom: 2rem;
+}
+
+.prompt-label {
+    font-style: italic;
+    font-size: 1.05rem;
+    color: #3D3632;
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+
+.prompt-line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+}
+
+.prompt-line .num {
+    font-size: 0.9rem;
+    color: #8A8078;
+    flex-shrink: 0;
+    width: 1rem;
+    text-align: right;
+}
+
+.prompt-line input,
+.prompt-single input {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #C8C0B8;
+    background: transparent;
+    font-family: 'Lora', Georgia, serif;
+    font-size: 1rem;
+    color: #2C2C2C;
+    padding: 0.3rem 0;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.prompt-line input:focus,
+.prompt-single input:focus {
+    border-bottom-color: #8A8078;
+}
+
+.prompt-line input[readonly],
+.prompt-single input[readonly] {
+    color: #4A4440;
+    cursor: default;
+}
+
+.prompt-single {
+    margin-bottom: 0.75rem;
+}
+
+/* Evening section */
+#evening {
+    margin-top: 1.5rem;
+    background: #EDEAE5;
+    padding: 1.5rem;
+    border-radius: 1rem;
+}
+
+/* Past entry styling */
+.past-entry {
+    background: #F5F0E8;
+}
+
+/* Dark mode */
+body.dark {
+    background: #1A1918;
+    color: #D4CFC8;
+}
+
+body.dark header h1 { color: #6B635B; }
+body.dark .date-nav button { color: #6B635B; }
+body.dark .date-nav button:hover:not(:disabled) { color: #D4CFC8; }
+body.dark .date-display { color: #8A8279; }
+body.dark .date-display:hover { color: #D4CFC8; }
+body.dark .quote p { color: #B8AFA8; }
+body.dark .quote cite { color: #7A7268; }
+body.dark .section-header h2 { color: #7A7268; }
+body.dark .icon-sun { color: #C49A3C; }
+body.dark .icon-moon { color: #7B8DA0; }
+body.dark .prompt-label { color: #B8AFA8; }
+body.dark .prompt-line .num { color: #6B635B; }
+body.dark .prompt-line input,
+body.dark .prompt-single input {
+    color: #D4CFC8;
+    border-bottom-color: #3A3632;
+}
+body.dark .prompt-line input:focus,
+body.dark .prompt-single input:focus {
+    border-bottom-color: #6B635B;
+}
+body.dark .prompt-line input[readonly],
+body.dark .prompt-single input[readonly] {
+    color: #9A918A;
+}
+
+body.dark #evening { background: #141210; }
+body.dark.past-entry { background: #151312; }
+
+/* Guide overlay */
+.guide-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.guide-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.guide {
+    background: #FAF8F5;
+    max-width: 540px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 2.5rem 2rem;
+    position: relative;
+}
+
+body.dark .guide {
+    background: #1A1918;
+}
+
+.guide-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #A09890;
+    cursor: pointer;
+    font-family: inherit;
+    line-height: 1;
+}
+
+.guide-close:hover { color: #2C2C2C; }
+body.dark .guide-close:hover { color: #D4CFC8; }
+
+.guide h2 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.02em;
+}
+
+.guide .guide-subtitle {
+    text-align: center;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: #8A8279;
+    margin-bottom: 2rem;
+}
+
+.guide-section {
+    margin-bottom: 2rem;
+}
+
+.guide-section h3 {
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #A09890;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.guide-step {
+    margin-bottom: 1.25rem;
+}
+
+.guide-step .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    background: #2C2C2C;
+    color: #FAF8F5;
+    font-size: 0.65rem;
+    font-weight: 500;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+body.dark .guide-step .step-num {
+    background: #D4CFC8;
+    color: #1A1918;
+}
+
+.guide-step p {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: #5A534B;
+    margin-top: 0.35rem;
+}
+
+body.dark .guide-step p { color: #8A8279; }
+
+.guide-step .step-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #2C2C2C;
+}
+
+body.dark .guide-step .step-title { color: #D4CFC8; }
+
+.guide-example {
+    font-style: italic;
+    color: #A09890;
+    font-size: 0.8rem;
+    margin-top: 0.35rem;
+    padding-left: 1.9rem;
+}
+
+.guide-divider {
+    border: none;
+    border-top: 1px solid #E8E3DD;
+    margin: 1.5rem 0;
+}
+
+body.dark .guide-divider { border-top-color: #2A2725; }
+
+.guide-privacy {
+    text-align: center;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: #8A8279;
+    margin-top: 0.5rem;
+}
+
+.guide-privacy strong {
+    color: #5A534B;
+    font-weight: 500;
+}
+
+body.dark .guide-privacy strong { color: #B8AFA8; }
+
+.guide-start {
+    display: block;
+    margin: 2rem auto 0;
+    background: none;
+    border: 1px solid #D4CFC8;
+    color: #6B635B;
+    font-family: 'Lora', Georgia, serif;
+    font-size: 0.8rem;
+    padding: 0.6rem 2rem;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+}
+
+.guide-start:hover {
+    border-color: #2C2C2C;
+    color: #2C2C2C;
+}
+
+body.dark .guide-start {
+    border-color: #3A3632;
+    color: #8A8279;
+}
+
+body.dark .guide-start:hover {
+    border-color: #D4CFC8;
+    color: #D4CFC8;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    #app { padding: 2rem 1.25rem 3rem; }
+    .guide { padding: 2rem 1.5rem; }
+}
+
+/* Smooth transition */
+body, body * {
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}

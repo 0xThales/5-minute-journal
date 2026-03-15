@@ -1,0 +1,7 @@
+name = "fmj-sync"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "JOURNAL_KV"
+id = "c13b046e10fd4df8ac574dc993b2f8d5"

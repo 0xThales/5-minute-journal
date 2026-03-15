@@ -1,2 +1,6 @@
 Five_Minute_Journal_Quickstart.pdf
 .vercel
+node_modules
+dist
+.env
+worker/node_modules

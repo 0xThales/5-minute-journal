@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5 Minute Journal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Lora', Georgia, 'Times New Roman', serif;
+            background: #FAF8F5;
+            color: #2C2C2C;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #app {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 3rem 2rem 4rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: #A09890;
+        }
+
+        /* Fixed buttons */
+        .fixed-btn {
+            position: fixed;
+            background: none;
+            border: none;
+            color: #A09890;
+            cursor: pointer;
+            padding: 0.5rem;
+            font-family: inherit;
+            transition: color 0.2s;
+            line-height: 1;
+            z-index: 10;
+        }
+
+        .fixed-btn:hover { color: #2C2C2C; }
+        body.dark .fixed-btn { color: #6B635B; }
+        body.dark .fixed-btn:hover { color: #D4CFC8; }
+
+        .theme-toggle {
+            bottom: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .help-toggle {
+            bottom: 1.5rem;
+            left: 1.5rem;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        .lang-toggle {
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* Date navigation */
+        .date-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .date-nav button {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            color: #A09890;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            font-family: inherit;
+            transition: color 0.2s;
+        }
+
+        .date-nav button:hover:not(:disabled) {
+            color: #2C2C2C;
+        }
+
+        .date-nav button:disabled {
+            opacity: 0;
+            cursor: default;
+        }
+
+        .date-display {
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            color: #4A4440;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .date-display:hover {
+            color: #2C2C2C;
+        }
+
+        .date-picker {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            cursor: pointer;
+        }
+
+        /* Quote */
+        .quote {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 0 1rem;
+        }
+
+        .quote p {
+            font-style: italic;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: #3D3632;
+            margin-bottom: 0.5rem;
+        }
+
+        .quote cite {
+            font-size: 0.8rem;
+            font-style: normal;
+            color: #7A7268;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-icon {
+            font-size: 1.15rem;
+        }
+
+        .icon-sun { color: #C49A3C; }
+        .icon-moon { color: #6E7F92; }
+
+        .section-header h2 {
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #7A7268;
+        }
+
+        /* Prompts */
+        .prompt {
+            margin-bottom: 2rem;
+        }
+
+        .prompt-label {
+            font-style: italic;
+            font-size: 1.05rem;
+            color: #3D3632;
+            text-align: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .prompt-line {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .prompt-line .num {
+            font-size: 0.9rem;
+            color: #8A8078;
+            flex-shrink: 0;
+            width: 1rem;
+            text-align: right;
+        }
+
+        .prompt-line input,
+        .prompt-single input {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #C8C0B8;
+            background: transparent;
+            font-family: 'Lora', Georgia, serif;
+            font-size: 1rem;
+            color: #2C2C2C;
+            padding: 0.3rem 0;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .prompt-line input:focus,
+        .prompt-single input:focus {
+            border-bottom-color: #8A8078;
+        }
+
+        .prompt-line input[readonly],
+        .prompt-single input[readonly] {
+            color: #4A4440;
+            cursor: default;
+        }
+
+        .prompt-single {
+            margin-bottom: 0.75rem;
+        }
+
+        /* Evening section */
+        #evening {
+            margin-top: 1.5rem;
+            background: #EDEAE5;
+            padding: 1.5rem;
+            border-radius: 1rem;
+        }
+
+        /* Past entry styling */
+        .past-entry {
+            background: #F5F0E8;
+        }
+
+        /* Dark mode */
+        body.dark {
+            background: #1A1918;
+            color: #D4CFC8;
+        }
+
+        body.dark header h1 { color: #6B635B; }
+        body.dark .date-nav button { color: #6B635B; }
+        body.dark .date-nav button:hover:not(:disabled) { color: #D4CFC8; }
+        body.dark .date-display { color: #8A8279; }
+        body.dark .date-display:hover { color: #D4CFC8; }
+        body.dark .quote p { color: #B8AFA8; }
+        body.dark .quote cite { color: #7A7268; }
+        body.dark .section-header h2 { color: #7A7268; }
+        body.dark .icon-sun { color: #C49A3C; }
+        body.dark .icon-moon { color: #7B8DA0; }
+        body.dark .prompt-label { color: #B8AFA8; }
+        body.dark .prompt-line .num { color: #6B635B; }
+        body.dark .prompt-line input,
+        body.dark .prompt-single input {
+            color: #D4CFC8;
+            border-bottom-color: #3A3632;
+        }
+        body.dark .prompt-line input:focus,
+        body.dark .prompt-single input:focus {
+            border-bottom-color: #6B635B;
+        }
+        body.dark .prompt-line input[readonly],
+        body.dark .prompt-single input[readonly] {
+            color: #9A918A;
+        }
+
+        body.dark #evening { background: #141210; }
+        body.dark.past-entry { background: #151312; }
+
+        /* Guide overlay */
+        .guide-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .guide-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .guide {
+            background: #FAF8F5;
+            max-width: 540px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2.5rem 2rem;
+            position: relative;
+        }
+
+        body.dark .guide {
+            background: #1A1918;
+        }
+
+        .guide-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.25rem;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #A09890;
+            cursor: pointer;
+            font-family: inherit;
+            line-height: 1;
+        }
+
+        .guide-close:hover { color: #2C2C2C; }
+        body.dark .guide-close:hover { color: #D4CFC8; }
+
+        .guide h2 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.02em;
+        }
+
+        .guide .guide-subtitle {
+            text-align: center;
+            font-style: italic;
+            font-size: 0.85rem;
+            color: #8A8279;
+            margin-bottom: 2rem;
+        }
+
+        .guide-section {
+            margin-bottom: 2rem;
+        }
+
+        .guide-section h3 {
+            font-size: 0.7rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #A09890;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .guide-step {
+            margin-bottom: 1.25rem;
+        }
+
+        .guide-step .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.4rem;
+            height: 1.4rem;
+            border-radius: 50%;
+            background: #2C2C2C;
+            color: #FAF8F5;
+            font-size: 0.65rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        body.dark .guide-step .step-num {
+            background: #D4CFC8;
+            color: #1A1918;
+        }
+
+        .guide-step p {
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: #5A534B;
+            margin-top: 0.35rem;
+        }
+
+        body.dark .guide-step p { color: #8A8279; }
+
+        .guide-step .step-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #2C2C2C;
+        }
+
+        body.dark .guide-step .step-title { color: #D4CFC8; }
+
+        .guide-example {
+            font-style: italic;
+            color: #A09890;
+            font-size: 0.8rem;
+            margin-top: 0.35rem;
+            padding-left: 1.9rem;
+        }
+
+        .guide-divider {
+            border: none;
+            border-top: 1px solid #E8E3DD;
+            margin: 1.5rem 0;
+        }
+
+        body.dark .guide-divider { border-top-color: #2A2725; }
+
+        .guide-privacy {
+            text-align: center;
+            font-size: 0.8rem;
+            line-height: 1.7;
+            color: #8A8279;
+            margin-top: 0.5rem;
+        }
+
+        .guide-privacy strong {
+            color: #5A534B;
+            font-weight: 500;
+        }
+
+        body.dark .guide-privacy strong { color: #B8AFA8; }
+
+        .guide-start {
+            display: block;
+            margin: 2rem auto 0;
+            background: none;
+            border: 1px solid #D4CFC8;
+            color: #6B635B;
+            font-family: 'Lora', Georgia, serif;
+            font-size: 0.8rem;
+            padding: 0.6rem 2rem;
+            cursor: pointer;
+            letter-spacing: 0.1em;
+            transition: all 0.2s;
+        }
+
+        .guide-start:hover {
+            border-color: #2C2C2C;
+            color: #2C2C2C;
+        }
+
+        body.dark .guide-start {
+            border-color: #3A3632;
+            color: #8A8279;
+        }
+
+        body.dark .guide-start:hover {
+            border-color: #D4CFC8;
+            color: #D4CFC8;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            #app { padding: 2rem 1.25rem 3rem; }
+            .guide { padding: 2rem 1.5rem; }
+        }
+
+        /* Smooth transition */
+        body, body * {
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1 id="t-title"></h1>
+        </header>
+
+        <nav class="date-nav">
+            <button id="prev-day" aria-label="Previous day">&larr;</button>
+            <span class="date-display" id="date-display">
+                <input type="date" class="date-picker" id="date-picker">
+            </span>
+            <button id="next-day" aria-label="Next day">&rarr;</button>
+        </nav>
+
+        <div class="quote" id="quote">
+            <p id="quote-text"></p>
+            <cite id="quote-author"></cite>
+        </div>
+
+        <section class="section" id="morning">
+            <div class="section-header">
+                <span class="section-icon icon-sun">&#9788;</span>
+                <h2 id="t-morning"></h2>
+            </div>
+
+            <div class="prompt">
+                <div class="prompt-label" id="t-grateful"></div>
+                <div class="prompt-line"><span class="num">1.</span><input type="text" data-field="grateful" data-index="0"></div>
+                <div class="prompt-line"><span class="num">2.</span><input type="text" data-field="grateful" data-index="1"></div>
+                <div class="prompt-line"><span class="num">3.</span><input type="text" data-field="grateful" data-index="2"></div>
+            </div>
+
+            <div class="prompt">
+                <div class="prompt-label" id="t-great"></div>
+                <div class="prompt-line"><span class="num">1.</span><input type="text" data-field="great" data-index="0"></div>
+                <div class="prompt-line"><span class="num">2.</span><input type="text" data-field="great" data-index="1"></div>
+                <div class="prompt-line"><span class="num">3.</span><input type="text" data-field="great" data-index="2"></div>
+            </div>
+
+            <div class="prompt">
+                <div class="prompt-label" id="t-affirmation"></div>
+                <div class="prompt-single"><input type="text" data-field="affirmation" data-index="0"></div>
+                <div class="prompt-single"><input type="text" data-field="affirmation" data-index="1"></div>
+            </div>
+        </section>
+
+        <section class="section" id="evening">
+            <div class="section-header">
+                <span class="section-icon icon-moon">&#9789;</span>
+                <h2 id="t-evening"></h2>
+            </div>
+
+            <div class="prompt">
+                <div class="prompt-label" id="t-amazing"></div>
+                <div class="prompt-line"><span class="num">1.</span><input type="text" data-field="amazing" data-index="0"></div>
+                <div class="prompt-line"><span class="num">2.</span><input type="text" data-field="amazing" data-index="1"></div>
+                <div class="prompt-line"><span class="num">3.</span><input type="text" data-field="amazing" data-index="2"></div>
+            </div>
+
+            <div class="prompt">
+                <div class="prompt-label" id="t-better"></div>
+                <div class="prompt-single"><input type="text" data-field="better" data-index="0"></div>
+                <div class="prompt-single"><input type="text" data-field="better" data-index="1"></div>
+            </div>
+        </section>
+    </div>
+
+    <button class="fixed-btn theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">&#9789;</button>
+    <button class="fixed-btn help-toggle" id="help-toggle" aria-label="How to use">?</button>
+    <button class="fixed-btn lang-toggle" id="lang-toggle"></button>
+
+    <!-- Guide overlay -->
+    <div class="guide-overlay" id="guide-overlay">
+        <div class="guide" id="guide-content"></div>
+    </div>
+
+    <script>
+        // --- i18n ---
+        const T = {
+            en: {
+                title: '5 Minute Journal',
+                morning: 'Morning',
+                evening: 'Evening',
+                grateful: 'I am grateful for...',
+                great: 'What would make today great?',
+                affirmation: 'Daily affirmations. I am...',
+                amazing: '3 Amazing things that happened today...',
+                better: 'How could I have made today even better?',
+                begin: 'Begin journaling',
+                guideTitle: 'The Five Minute Journal',
+                guideSubtitle: 'The simplest, most effective thing you can do every day to be happier.',
+                guideMorning: 'The Morning Routine',
+                guideEvening: 'The Night Routine',
+                step1title: 'I am grateful for...',
+                step1text: 'As soon as you wake up, write 3 things you are grateful for. Get specific. Take time to connect with the feeling behind your gratitude before moving on.',
+                step1example: 'e.g. "The warm bed that I sleep in" \u00b7 "My body working in perfect harmony" \u00b7 "The true and genuine friends in my life"',
+                step2title: 'What would make today great?',
+                step2text: 'Write down 3 actions you will take today. Ask yourself how you want to feel at the end of the day and write down actions that would give you that feeling.',
+                step2example: 'e.g. "Take extra time for myself before leaving work" \u00b7 "Give a thank you note to mom" \u00b7 "Sleep before 10 pm"',
+                step3title: 'Daily affirmations. I am...',
+                step3text: 'Write a simple statement in the present tense that focuses on what you want to create in your life. The litmus test is how you feel after you write it. If it doesn\'t resonate, step back and reassess.',
+                step3example: 'e.g. "I am confident and comfortable in my own skin and I live with passion and purpose."',
+                step4title: '3 Amazing things that happened today...',
+                step4text: 'Before going to sleep, write 3 amazing things that happened during your day. Get specific and remember to connect with the feeling.',
+                step4example: 'e.g. "I remembered to floss" \u00b7 "A friend recommended a wonderful book" \u00b7 "I saw a cute stranger at the cafe"',
+                step5title: 'How could I have made today even better?',
+                step5text: 'Review your day, but there is no need to be harsh. Be honest yet kind to yourself. This is your personal reminder that you have the power to change your perception of the past and influence the future.',
+                step5example: 'e.g. "I wake up when the alarm goes off" \u00b7 "I go to the gym in the morning"',
+                privacy: '<strong>Your journal is private.</strong> All entries are saved locally on your device. No accounts, no servers, no one can read your thoughts.',
+                langSwitch: 'ES',
+                dateLang: 'en-US',
+            },
+            es: {
+                title: 'Diario de 5 Minutos',
+                morning: 'Ma\u00f1ana',
+                evening: 'Noche',
+                grateful: 'Estoy agradecido/a por...',
+                great: '\u00bfQu\u00e9 har\u00eda que hoy fuera genial?',
+                affirmation: 'Afirmaciones diarias. Yo soy...',
+                amazing: '3 Cosas incre\u00edbles que pasaron hoy...',
+                better: '\u00bfC\u00f3mo podr\u00eda haber hecho hoy a\u00fan mejor?',
+                begin: 'Comenzar a escribir',
+                guideTitle: 'El Diario de 5 Minutos',
+                guideSubtitle: 'Lo m\u00e1s simple y efectivo que puedes hacer cada d\u00eda para ser m\u00e1s feliz.',
+                guideMorning: 'La Rutina de la Ma\u00f1ana',
+                guideEvening: 'La Rutina de la Noche',
+                step1title: 'Estoy agradecido/a por...',
+                step1text: 'Al despertar, escribe 3 cosas por las que est\u00e1s agradecido/a. S\u00e9 espec\u00edfico/a. T\u00f3mate un momento para conectar con el sentimiento detr\u00e1s de tu gratitud antes de continuar.',
+                step1example: 'ej. "La cama c\u00e1lida en la que duermo" \u00b7 "Mi cuerpo funcionando en perfecta armon\u00eda" \u00b7 "Los amigos verdaderos en mi vida"',
+                step2title: '\u00bfQu\u00e9 har\u00eda que hoy fuera genial?',
+                step2text: 'Escribe 3 acciones que tomar\u00e1s hoy. Preg\u00fantate c\u00f3mo quieres sentirte al final del d\u00eda y escribe acciones que te dar\u00edan esa sensaci\u00f3n.',
+                step2example: 'ej. "Tomarme un tiempo extra antes de salir del trabajo" \u00b7 "Darle una nota de agradecimiento a mam\u00e1" \u00b7 "Dormir antes de las 10 pm"',
+                step3title: 'Afirmaciones diarias. Yo soy...',
+                step3text: 'Escribe una declaraci\u00f3n simple en tiempo presente que se enfoque en lo que quieres crear en tu vida. La prueba de fuego es c\u00f3mo te sientes despu\u00e9s de escribirla. Si no resuena, reconsidera.',
+                step3example: 'ej. "Soy seguro/a y c\u00f3modo/a en mi propia piel y vivo con pasi\u00f3n y prop\u00f3sito."',
+                step4title: '3 Cosas incre\u00edbles que pasaron hoy...',
+                step4text: 'Antes de dormir, escribe 3 cosas incre\u00edbles que sucedieron durante tu d\u00eda. S\u00e9 espec\u00edfico/a y recuerda conectar con el sentimiento.',
+                step4example: 'ej. "Me acord\u00e9 de usar hilo dental" \u00b7 "Un amigo me recomend\u00f3 un libro maravilloso" \u00b7 "Vi a alguien lindo en la cafeter\u00eda"',
+                step5title: '\u00bfC\u00f3mo podr\u00eda haber hecho hoy a\u00fan mejor?',
+                step5text: 'Revisa tu d\u00eda, pero sin ser duro/a contigo mismo/a. S\u00e9 honesto/a pero amable. Este es tu recordatorio personal de que tienes el poder de cambiar tu percepci\u00f3n del pasado e influir en el futuro.',
+                step5example: 'ej. "Me despierto cuando suena la alarma" \u00b7 "Voy al gimnasio por la ma\u00f1ana"',
+                privacy: '<strong>Tu diario es privado.</strong> Todas las entradas se guardan localmente en tu dispositivo. Sin cuentas, sin servidores, nadie puede leer tus pensamientos.',
+                langSwitch: 'EN',
+                dateLang: 'es-ES',
+            }
+        };
+
+        let lang = localStorage.getItem('journal:lang') || (navigator.language.startsWith('es') ? 'es' : 'en');
+
+        function t(key) { return T[lang][key]; }
+
+        function applyTranslations() {
+            document.documentElement.lang = lang;
+            document.title = t('title');
+            document.getElementById('t-title').textContent = t('title');
+            document.getElementById('t-morning').textContent = t('morning');
+            document.getElementById('t-evening').textContent = t('evening');
+            document.getElementById('t-grateful').textContent = t('grateful');
+            document.getElementById('t-great').textContent = t('great');
+            document.getElementById('t-affirmation').textContent = t('affirmation');
+            document.getElementById('t-amazing').textContent = t('amazing');
+            document.getElementById('t-better').textContent = t('better');
+            document.getElementById('lang-toggle').textContent = t('langSwitch');
+            renderGuide();
+        }
+
+        function renderGuide() {
+            document.getElementById('guide-content').innerHTML = `
+                <button class="guide-close" id="guide-close">&times;</button>
+                <h2>${t('guideTitle')}</h2>
+                <p class="guide-subtitle">${t('guideSubtitle')}</p>
+                <hr class="guide-divider">
+                <div class="guide-section">
+                    <h3><span class="icon-sun">&#9788;</span> ${t('guideMorning')}</h3>
+                    <div class="guide-step">
+                        <span class="step-num">1</span><span class="step-title">${t('step1title')}</span>
+                        <p>${t('step1text')}</p>
+                        <div class="guide-example">${t('step1example')}</div>
+                    </div>
+                    <div class="guide-step">
+                        <span class="step-num">2</span><span class="step-title">${t('step2title')}</span>
+                        <p>${t('step2text')}</p>
+                        <div class="guide-example">${t('step2example')}</div>
+                    </div>
+                    <div class="guide-step">
+                        <span class="step-num">3</span><span class="step-title">${t('step3title')}</span>
+                        <p>${t('step3text')}</p>
+                        <div class="guide-example">${t('step3example')}</div>
+                    </div>
+                </div>
+                <hr class="guide-divider">
+                <div class="guide-section">
+                    <h3><span class="icon-moon">&#9789;</span> ${t('guideEvening')}</h3>
+                    <div class="guide-step">
+                        <span class="step-num">4</span><span class="step-title">${t('step4title')}</span>
+                        <p>${t('step4text')}</p>
+                        <div class="guide-example">${t('step4example')}</div>
+                    </div>
+                    <div class="guide-step">
+                        <span class="step-num">5</span><span class="step-title">${t('step5title')}</span>
+                        <p>${t('step5text')}</p>
+                        <div class="guide-example">${t('step5example')}</div>
+                    </div>
+                </div>
+                <hr class="guide-divider">
+                <p class="guide-privacy">${t('privacy')}</p>
+                <button class="guide-start" id="guide-start">${t('begin')}</button>
+            `;
+            // Re-bind guide buttons
+            document.getElementById('guide-close').addEventListener('click', closeGuide);
+            document.getElementById('guide-start').addEventListener('click', closeGuide);
+        }
+
+        // --- Quotes ---
+        const QUOTES = [
+            { text: "The unexamined life is not worth living.", author: "Socrates", es: "Una vida sin examen no merece ser vivida." },
+            { text: "We suffer more often in imagination than in reality.", author: "Seneca", es: "Sufrimos m\u00e1s en la imaginaci\u00f3n que en la realidad." },
+            { text: "The soul becomes dyed with the colour of its thoughts.", author: "Marcus Aurelius", es: "El alma se ti\u00f1e del color de sus pensamientos." },
+            { text: "No man is free who is not master of himself.", author: "Epictetus", es: "No es libre quien no es due\u00f1o de s\u00ed mismo." },
+            { text: "Knowing yourself is the beginning of all wisdom.", author: "Aristotle", es: "Conocerse a uno mismo es el principio de toda sabidur\u00eda." },
+            { text: "The only true wisdom is in knowing you know nothing.", author: "Socrates", es: "La \u00fanica verdadera sabidur\u00eda es saber que no sabes nada." },
+            { text: "It is not that we have a short time to live, but that we waste a great deal of it.", author: "Seneca", es: "No es que tengamos poco tiempo, sino que perdemos mucho." },
+            { text: "Happiness depends upon ourselves.", author: "Aristotle", es: "La felicidad depende de nosotros mismos." },
+            { text: "Man is the measure of all things.", author: "Protagoras", es: "El hombre es la medida de todas las cosas." },
+            { text: "The mind is everything. What you think you become.", author: "Buddha", es: "La mente lo es todo. En lo que piensas, te conviertes." },
+            { text: "He who has a why to live can bear almost any how.", author: "Nietzsche", es: "Quien tiene un porqu\u00e9 para vivir puede soportar casi cualquier c\u00f3mo." },
+            { text: "The way to do is to be.", author: "Lao Tzu", es: "El camino del hacer es ser." },
+            { text: "Everything flows.", author: "Heraclitus", es: "Todo fluye." },
+            { text: "Waste no more time arguing about what a good man should be. Be one.", author: "Marcus Aurelius", es: "No pierdas m\u00e1s tiempo discutiendo qu\u00e9 debe ser un buen hombre. S\u00e9 uno." },
+            { text: "It is the mark of an educated mind to be able to entertain a thought without accepting it.", author: "Aristotle", es: "Es propio de una mente educada poder considerar un pensamiento sin aceptarlo." },
+            { text: "The impediment to action advances action. What stands in the way becomes the way.", author: "Marcus Aurelius", es: "El obst\u00e1culo en el camino se convierte en el camino." },
+            { text: "Man is condemned to be free.", author: "Jean-Paul Sartre", es: "El hombre est\u00e1 condenado a ser libre." },
+            { text: "One cannot step twice in the same river.", author: "Heraclitus", es: "Nadie se ba\u00f1a dos veces en el mismo r\u00edo." },
+            { text: "The happiness of your life depends upon the quality of your thoughts.", author: "Marcus Aurelius", es: "La felicidad de tu vida depende de la calidad de tus pensamientos." },
+            { text: "To be is to be perceived.", author: "George Berkeley", es: "Ser es ser percibido." },
+            { text: "Liberty consists in doing what one desires.", author: "John Stuart Mill", es: "La libertad consiste en hacer lo que uno desea." },
+            { text: "The life of money-making is one undertaken under compulsion, and wealth is evidently not the good we are seeking.", author: "Aristotle", es: "La vida dedicada a hacer dinero se emprende por obligaci\u00f3n, y la riqueza no es el bien que buscamos." },
+            { text: "Begin at once to live, and count each separate day as a separate life.", author: "Seneca", es: "Empieza a vivir de inmediato y cuenta cada d\u00eda como una vida separada." },
+            { text: "In the depth of winter, I finally learned that within me there lay an invincible summer.", author: "Albert Camus", es: "En lo m\u00e1s profundo del invierno, finalmente aprend\u00ed que dentro de m\u00ed hab\u00eda un verano invencible." },
+            { text: "The secret of happiness, you see, is not found in seeking more, but in developing the capacity to enjoy less.", author: "Socrates", es: "El secreto de la felicidad no est\u00e1 en buscar m\u00e1s, sino en desarrollar la capacidad de disfrutar con menos." },
+            { text: "A man who dares to waste one hour of time has not discovered the value of life.", author: "Charles Darwin", es: "Un hombre que se atreve a desperdiciar una hora no ha descubierto el valor de la vida." },
+            { text: "If you are distressed by anything external, the pain is not due to the thing itself, but to your estimate of it.", author: "Marcus Aurelius", es: "Si algo externo te angustia, el dolor no se debe a la cosa en s\u00ed, sino a tu valoraci\u00f3n de ella." },
+            { text: "The soul that sees beauty may sometimes walk alone.", author: "Goethe", es: "El alma que ve la belleza a veces camina sola." },
+            { text: "To live is the rarest thing in the world. Most people exist, that is all.", author: "Oscar Wilde", es: "Vivir es lo m\u00e1s raro del mundo. La mayor\u00eda de la gente solo existe." },
+            { text: "He who fears death will never do anything worthy of a living man.", author: "Seneca", es: "Quien teme a la muerte nunca har\u00e1 nada digno de un hombre vivo." },
+            { text: "The only thing I know is that I know nothing.", author: "Socrates", es: "Solo s\u00e9 que no s\u00e9 nada." },
+            { text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.", author: "Aristotle", es: "Somos lo que hacemos repetidamente. La excelencia no es un acto, sino un h\u00e1bito." },
+            { text: "The mind that is anxious about future events is miserable.", author: "Seneca", es: "La mente que se preocupa por el futuro es miserable." },
+            { text: "Thou shouldst eat to live; not live to eat.", author: "Socrates", es: "Debes comer para vivir, no vivir para comer." },
+            { text: "A journey of a thousand miles begins with a single step.", author: "Lao Tzu", es: "Un viaje de mil millas comienza con un solo paso." },
+            { text: "The world is full of magical things patiently waiting for our wits to grow sharper.", author: "Bertrand Russell", es: "El mundo est\u00e1 lleno de cosas m\u00e1gicas esperando pacientemente a que nuestro ingenio se agudice." },
+            { text: "What we achieve inwardly will change outer reality.", author: "Plutarch", es: "Lo que logremos internamente cambiar\u00e1 la realidad exterior." },
+            { text: "The greatest wealth is to live content with little.", author: "Plato", es: "La mayor riqueza es vivir contento con poco." },
+            { text: "Be tolerant with others and strict with yourself.", author: "Marcus Aurelius", es: "S\u00e9 tolerante con los dem\u00e1s y estricto contigo mismo." },
+            { text: "Nothing exists except atoms and empty space; everything else is opinion.", author: "Democritus", es: "Nada existe excepto \u00e1tomos y espacio vac\u00edo; todo lo dem\u00e1s es opini\u00f3n." },
+            { text: "The measure of a man is what he does with power.", author: "Plato", es: "La medida de un hombre es lo que hace con el poder." },
+            { text: "He is a wise man who does not grieve for the things which he has not, but rejoices for those which he has.", author: "Epictetus", es: "Es sabio quien no se lamenta por lo que no tiene, sino que se alegra por lo que tiene." },
+            { text: "One must imagine Sisyphus happy.", author: "Albert Camus", es: "Hay que imaginar a S\u00edsifo feliz." },
+            { text: "The soul is healed by being with children.", author: "Dostoevsky", es: "El alma se cura estando con ni\u00f1os." },
+            { text: "To find yourself, think for yourself.", author: "Socrates", es: "Para encontrarte a ti mismo, piensa por ti mismo." },
+            { text: "All things are ready, if our minds be so.", author: "Shakespeare", es: "Todo est\u00e1 listo, si nuestra mente lo est\u00e1." },
+            { text: "That which does not kill us makes us stronger.", author: "Nietzsche", es: "Lo que no nos mata nos hace m\u00e1s fuertes." },
+            { text: "I think therefore I am.", author: "Descartes", es: "Pienso, luego existo." },
+            { text: "The wound is the place where the light enters you.", author: "Rumi", es: "La herida es el lugar por donde la luz entra en ti." },
+            { text: "Do not spoil what you have by desiring what you have not.", author: "Epicurus", es: "No arruines lo que tienes deseando lo que no tienes." },
+        ];
+
+        // --- Date utilities ---
+        function getToday() {
+            const d = new Date();
+            return formatDate(d);
+        }
+
+        function formatDate(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function parseDate(str) {
+            const [y, m, d] = str.split('-').map(Number);
+            return new Date(y, m - 1, d);
+        }
+
+        function displayDate(str) {
+            const d = parseDate(str);
+            return d.toLocaleDateString(t('dateLang'), { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function getDayOfYear(str) {
+            const d = parseDate(str);
+            const start = new Date(d.getFullYear(), 0, 0);
+            return Math.floor((d - start) / 86400000);
+        }
+
+        function addDays(str, n) {
+            const d = parseDate(str);
+            d.setDate(d.getDate() + n);
+            return formatDate(d);
+        }
+
+        // --- State ---
+        let currentDate = getToday();
+
+        // --- Storage ---
+        function emptyEntry() {
+            return {
+                morning: { grateful: ['', '', ''], great: ['', '', ''], affirmation: ['', ''] },
+                evening: { amazing: ['', '', ''], better: ['', ''] }
+            };
+        }
+
+        function loadEntry(date) {
+            const raw = localStorage.getItem(`journal:${date}`);
+            if (!raw) return emptyEntry();
+            const entry = JSON.parse(raw);
+            if (entry.evening && entry.evening.highlights) {
+                entry.evening.amazing = entry.evening.highlights;
+                delete entry.evening.highlights;
+            }
+            if (entry.evening && typeof entry.evening.learned === 'string') {
+                entry.evening.better = [entry.evening.learned, ''];
+                delete entry.evening.learned;
+            }
+            if (entry.morning && typeof entry.morning.affirmation === 'string') {
+                entry.morning.affirmation = [entry.morning.affirmation, ''];
+            }
+            if (entry.evening && typeof entry.evening.better === 'string') {
+                entry.evening.better = [entry.evening.better, ''];
+            }
+            return entry;
+        }
+
+        function saveEntry() {
+            const entry = readFieldsToEntry();
+            localStorage.setItem(`journal:${currentDate}`, JSON.stringify(entry));
+        }
+
+        function readFieldsToEntry() {
+            const entry = emptyEntry();
+            document.querySelectorAll('input[data-field]').forEach(input => {
+                const field = input.dataset.field;
+                const index = input.dataset.index;
+                const section = ['grateful', 'great', 'affirmation'].includes(field) ? 'morning' : 'evening';
+                if (index !== undefined) {
+                    entry[section][field][parseInt(index)] = input.value;
+                } else {
+                    entry[section][field] = input.value;
+                }
+            });
+            return entry;
+        }
+
+        // --- Debounced save ---
+        let saveTimer;
+        function debouncedSave() {
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(saveEntry, 300);
+        }
+
+        // --- Rendering ---
+        function renderPage(date) {
+            currentDate = date;
+            const today = getToday();
+            const isToday = date === today;
+            const isFuture = date > today;
+
+            if (isFuture) {
+                currentDate = today;
+                renderPage(today);
+                return;
+            }
+
+            // Date display
+            document.getElementById('date-display').childNodes[0]?.remove();
+            document.getElementById('date-display').insertAdjacentText('afterbegin', displayDate(date));
+
+            // Date picker
+            const picker = document.getElementById('date-picker');
+            picker.value = date;
+            picker.max = today;
+
+            // Nav buttons
+            document.getElementById('next-day').disabled = isToday;
+            const entryDates = getEntryDates();
+            const firstEntry = entryDates[0] || today;
+            document.getElementById('prev-day').disabled = date <= firstEntry;
+            picker.min = firstEntry;
+
+            // Quote
+            const dayOfYear = getDayOfYear(date);
+            const quote = QUOTES[(dayOfYear - 1) % QUOTES.length];
+            const quoteText = lang === 'es' && quote.es ? quote.es : quote.text;
+            document.getElementById('quote-text').textContent = `\u201C${quoteText}\u201D`;
+            document.getElementById('quote-author').textContent = `\u2014 ${quote.author}`;
+
+            // Entry data
+            const entry = loadEntry(date);
+
+            // Populate fields
+            document.querySelectorAll('input[data-field]').forEach(input => {
+                const field = input.dataset.field;
+                const index = input.dataset.index;
+                const section = ['grateful', 'great', 'affirmation'].includes(field) ? 'morning' : 'evening';
+                if (index !== undefined) {
+                    input.value = (entry[section][field] && entry[section][field][parseInt(index)]) || '';
+                } else {
+                    input.value = entry[section][field] || '';
+                }
+                input.readOnly = !isToday;
+            });
+
+            // Past entry styling
+            document.body.classList.toggle('past-entry', !isToday);
+        }
+
+        // --- Helpers ---
+        function getEntryDates() {
+            return Object.keys(localStorage)
+                .filter(k => k.startsWith('journal:') && k !== 'journal:theme' && k !== 'journal:guided' && k !== 'journal:lang')
+                .map(k => k.replace('journal:', ''))
+                .sort();
+        }
+
+        // --- Event listeners ---
+        document.getElementById('prev-day').addEventListener('click', () => {
+            const prev = addDays(currentDate, -1);
+            const dates = getEntryDates();
+            const firstEntry = dates[0] || getToday();
+            if (prev >= firstEntry) renderPage(prev);
+        });
+
+        document.getElementById('next-day').addEventListener('click', () => {
+            const next = addDays(currentDate, 1);
+            if (next <= getToday()) renderPage(next);
+        });
+
+        document.getElementById('date-picker').addEventListener('change', (e) => {
+            const val = e.target.value;
+            const dates = getEntryDates();
+            const firstEntry = dates[0] || getToday();
+            if (val && val >= firstEntry && val <= getToday()) {
+                renderPage(val);
+            }
+        });
+
+        // Limit input to one visual line
+        const measureCanvas = document.createElement('canvas');
+        const measureCtx = measureCanvas.getContext('2d');
+
+        function getAvailableWidth(input) {
+            const style = getComputedStyle(input);
+            measureCtx.font = style.font || `${style.fontSize} ${style.fontFamily}`;
+            return input.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+        }
+
+        function trimToFit(input) {
+            const available = getAvailableWidth(input);
+            let val = input.value;
+            while (val.length > 0 && measureCtx.measureText(val).width > available) {
+                val = val.slice(0, -1);
+            }
+            if (val !== input.value) input.value = val;
+        }
+
+        // Auto-save on input
+        document.querySelectorAll('input[data-field]').forEach(input => {
+            input.addEventListener('input', () => {
+                trimToFit(input);
+                debouncedSave();
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            if (e.key === 'ArrowLeft') document.getElementById('prev-day').click();
+            if (e.key === 'ArrowRight') document.getElementById('next-day').click();
+            if (e.key === 'Escape') closeGuide();
+        });
+
+        // Midnight rollover check
+        setInterval(() => {
+            const today = getToday();
+            if (currentDate !== today && document.getElementById('next-day').disabled) {
+                renderPage(today);
+            }
+        }, 60000);
+
+        // --- Theme ---
+        function initTheme() {
+            const saved = localStorage.getItem('journal:theme');
+            if (saved === 'dark') {
+                document.body.classList.add('dark');
+                document.getElementById('theme-toggle').innerHTML = '&#9788;';
+            }
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const isDark = document.body.classList.toggle('dark');
+            localStorage.setItem('journal:theme', isDark ? 'dark' : 'light');
+            document.getElementById('theme-toggle').innerHTML = isDark ? '&#9788;' : '&#9789;';
+        });
+
+        // --- Language ---
+        document.getElementById('lang-toggle').addEventListener('click', () => {
+            lang = lang === 'en' ? 'es' : 'en';
+            localStorage.setItem('journal:lang', lang);
+            applyTranslations();
+            renderPage(currentDate);
+        });
+
+        // --- Guide ---
+        const overlay = document.getElementById('guide-overlay');
+
+        function openGuide() {
+            overlay.classList.add('visible');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeGuide() {
+            overlay.classList.remove('visible');
+            document.body.style.overflow = '';
+            localStorage.setItem('journal:guided', '1');
+        }
+
+        document.getElementById('help-toggle').addEventListener('click', openGuide);
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeGuide();
+        });
+
+        // --- Boot ---
+        initTheme();
+        applyTranslations();
+        renderPage(getToday());
+
+        if (!localStorage.getItem('journal:guided')) {
+            openGuide();
+        }
+    </script>
+</body>
+</html>
